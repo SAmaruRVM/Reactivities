@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using Application.Activities;
+using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -30,6 +33,12 @@ namespace API
             services.AddCors(options => {
                 options.AddDefaultPolicy(op => op.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
+
+            services.AddMediatR(typeof(List.Handler).Assembly);
+
+
+
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -42,9 +51,11 @@ namespace API
 
             app.UseCors(); 
 
-            app.UseHttpsRedirection();
+            // app.UseHttpsRedirection();
 
             app.UseRouting();
+            
+            
 
             app.UseAuthorization();
 

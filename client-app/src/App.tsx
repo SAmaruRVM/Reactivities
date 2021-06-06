@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import MainImage from './drinks.jpg'
 import './App.css';
 import { Header, List, ListItem } from 'semantic-ui-react'
 
@@ -20,7 +19,7 @@ function App() {
       <header className="App-header">
         <List>
           {activities.map((activity: any) => (
-            <ListItem key={activity.id} style={{ color: '#000', listStyleType: 'none' }}>
+            <ListItem key={activity.id} style={{ color: '#FFF', listStyleType: 'none' }}>
               <h4>{activity.title}</h4>
               <p>{activity.description}</p>
               <p>@{activity.city} in {activity.venue}</p>

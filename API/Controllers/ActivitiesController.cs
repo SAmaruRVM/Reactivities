@@ -1,8 +1,9 @@
-
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Application.Activities;
 using Domain;
+using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Persistence;
@@ -10,15 +11,12 @@ namespace API.Controllers
 {
     public class ActivitiesController : BaseApiController
     {
-        private readonly DataContext _context = default;
-        public ActivitiesController(DataContext context) => (_context) = (context); 
 
-
-
+    
+    
         [HttpGet]
         [ProducesResponseType(typeof(Task<ActionResult<IEnumerable<Activity>>>), 200)]
-        public async Task<ActionResult<IEnumerable<Activity>>> GetActivities() => await _context.Activities.ToListAsync();
-    
+        public async Task<ActionResult<IEnumerable<Activity>>> GetActivities() => await Mediator.Send(new List.Query());
     
     
     
@@ -27,17 +25,34 @@ namespace API.Controllers
         [ProducesResponseType(404)]
         [Route("[action]/Id/{id}")]
         public async Task<ActionResult<Activity>> GetActivityById([FromRoute] Guid id) 
-        {
-            Activity activityWithSearchedId = await _context.Activities.FindAsync(id);
+            => await Mediator.Send(new Details.Query { Id = id });
 
-            if(activityWithSearchedId is null) 
+
+        [HttpPost]
+        [ProducesResponseType(201)]
+        public async Task<IActionResult> Create([FromBody] Activity activity) => Created(nameof(Created), await Mediator.Send(new Create.Command { Activity = activity}));
+
+
+        [HttpPut]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> Update([FromBody] Activity activity)
+        {
+            if(activity.Id == Guid.Empty || activity.Id == default)
             {
-                return NotFound();
+                return BadRequest(activity);
             }
 
-            return activityWithSearchedId;
-        }
+            return Ok(await Mediator.Send(new Update.Command { Activity = activity} ));
+        } 
 
+
+
+        [HttpDelete]
+        [ProducesResponseType(200)]
+        [Route("[action]/Id/{id}")]
+        
+        public async Task<IActionResult> Delete([FromRoute] Guid id) => Ok(await Mediator.Send(new Delete.Command { Id = id }));
     
     }
 }
